@@ -1,14 +1,16 @@
-from tokens import Tokens
 from position import Position
+from tokens import Tokens
 from errors import IllCharError
 from constants import TT_INT, TT_FLOAT, TT_PLS, TT_MIN, TT_MUL, TT_DIV, DIGITS, TT_LPAR, TT_RPAR
 
 class Lexer:
     def __init__(self, fn):
         self.fn = fn
-        self.contents = None
+        with open(fn, 'r') as f:
+            self.contents = f.read()
         self.current_char = None
-        self.pos = Position(-1, -1, fn, self.contents)
+        self.pos = Position(-1, -1, self.fn, self.contents)
+        self.advance()
     
     def read_file(self):
         with open(self.fn, 'r') as f:
@@ -16,7 +18,7 @@ class Lexer:
     
     def advance(self):
         self.pos.advance(self.current_char)
-        self.current_char = self.read_file()[self.pos.idx] if self.pos.idx < len(self.text) else None
+        self.current_char = self.contents[self.pos.idx] if self.pos.idx < len(self.contents) else None
     
     def make_num(self):
         num_str = ''
@@ -40,9 +42,9 @@ class Lexer:
 
     def make_tokens(self):
         tokens = []
-
         while self.current_char != None:
-            if self.current_char in ' \t':
+            print(f"self.current_char is {self.current_char}")
+            if self.current_char in ' \t\n':
                 self.advance()
             elif self.current_char in DIGITS:
                 tokens.append(self.make_num())
@@ -70,5 +72,8 @@ class Lexer:
                 pos_start = self.pos.copy()
                 char = self.current_char
                 self.advance()
+                print("returning")
                 return [], IllCharError(pos_start, self.pos, f'Illegal Character "{char}" ')
+
+        return tokens, None
 

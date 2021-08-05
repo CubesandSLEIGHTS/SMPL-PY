@@ -7,7 +7,6 @@ class Position:
 
     def advance(self, current_char):
         self.idx += 1
-        self.col += 1
 
         if current_char == '\n':
             self.ln += 1
